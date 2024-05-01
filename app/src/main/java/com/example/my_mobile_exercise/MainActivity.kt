@@ -7,12 +7,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import com.example.my_mobile_exercise.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val contactList = ArrayList<Person>()
+    private var user: User? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -23,18 +26,27 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        // Configura os ouvintes de eventos
+        setUpView()
         setUpListeners()
     }
 
-    // Configura o ouvinte de eventos para o botão de adicionar pessoa
-    private fun setUpListeners(){
+    private fun setUpView() {
+        user = intent.getExtra<User>(USER)
+        user?.let {
+            binding.txtWelcomeMessage.text = getString(R.string.welcome_message, user?.name)
+            binding.txtUserEmail.text = getString(R.string.e_mail, user?.email)
+        } ?: run {
+            binding.txtWelcomeMessage.isVisible = false
+            binding.txtUserEmail.isVisible = false
+        }
+    }
+
+    private fun setUpListeners() {
         binding.btnAddPerson.setOnClickListener {
             addContact()
         }
     }
 
-    // Adiciona um contato à lista
     private fun addContact() {
         val name = binding.editTextName.text.toString()
         val phone = binding.editTextPhone.text.toString()
@@ -50,7 +62,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Valida o formulário
     private fun isFormValid(person: Person): Boolean =
         validateField(person.name, binding.editTextName, R.string.name)
                 && validateField(person.phone, binding.editTextPhone, R.string.phone)
@@ -58,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 && validateField(person.hobby, binding.editTextHobby, R.string.hobby)
                 && validateField(person.sex, binding.editTextSex, R.string.sex)
 
-    // Valida campos de texto
+
     private fun validateField(
         text: String,
         view: AppCompatEditText,
@@ -73,7 +84,6 @@ class MainActivity : AppCompatActivity() {
         return isToAdd1
     }
 
-    // Valida o campo de idade
     private fun validateField(
         age: Int,
         view: AppCompatEditText,
@@ -86,5 +96,9 @@ class MainActivity : AppCompatActivity() {
             isToAdd1 = false
         }
         return isToAdd1
+    }
+
+    companion object {
+        const val USER = "USER"
     }
 }
