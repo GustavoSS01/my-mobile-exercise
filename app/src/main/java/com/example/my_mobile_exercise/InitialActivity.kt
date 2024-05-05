@@ -62,5 +62,4 @@ class InitialActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-
 }
